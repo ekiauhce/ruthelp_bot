@@ -26,7 +26,7 @@ INSERT INTO categories(category) VALUES
 
 select_categories = \
 """
-SELECT * FROM categories;
+SELECT category FROM categories;
 """
 
 create_applications_table = \
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS applications(
     gender TEXT NOT NULL,
     surname TEXT NOT NULL,
     name TEXT NOT NULL,
-    patronymic TEXT NOT NULL,
+    middle_name TEXT NOT NULL,
     phone_number TEXT NOT NULL,
     inn TEXT NOT NULL
 );
@@ -52,8 +52,36 @@ INSERT INTO applications(
     gender,
     surname,
     name,
-    patronymic,
+    middle_name,
     phone_number,
     inn
 ) VALUES(?, ?, ?, ?, ?, ?, ?, ?);
+"""
+
+create_directors_table = \
+"""
+CREATE TABLE IF NOT EXISTS directors(
+    director_id INTEGER NOT NULL PRIMARY KEY,
+    director TEXT NOT NULL
+);
+"""
+
+insert_directors = \
+"""
+INSERT INTO directors(director) VALUES
+    ('Н.В. Попова'),
+    ('И.А. Коновал'),
+    ('Т.В. Гаранина'),
+    ('Е.В. Бычкова'),
+    ('Н.Ю. Лахметкина');
+"""
+
+select_director = \
+"""
+SELECT 
+    director
+FROM
+    directors
+WHERE
+    director_id = ?;
 """

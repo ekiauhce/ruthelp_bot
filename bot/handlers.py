@@ -11,7 +11,7 @@ from database import db
 
 #Состояния, в которых может находится диалог
 CATEGORY, GROUP_NAME, GENDER, SURNAME, NAME, \
-PATRONYMIC, PHONE_NUMBER, INN, CHECK = range(9)
+MIDDLE_NAME, PHONE_NUMBER, INN, CHECK = range(9)
 
 #TODO: добавить логирование
 
@@ -70,13 +70,13 @@ def name(update, context):
     """Добавляет имя в контекст пользователя и предлагает ввести отчество"""
     context.user_data[NAME] = update.message.text
 
-    update.message.reply_text(mt.patronymic)
-    context.user_data["state"] = PATRONYMIC
-    return PATRONYMIC
+    update.message.reply_text(mt.middle_name)
+    context.user_data["state"] = MIDDLE_NAME
+    return MIDDLE_NAME
 
-def patronymic(update, context):
+def middle_name(update, context):
     """Добавляет отчество в контекст пользователя и предлагает ввести номер телефона"""
-    context.user_data[PATRONYMIC] = update.message.text
+    context.user_data[MIDDLE_NAME] = update.message.text
 
     update.message.reply_text(mt.phone_number)
     context.user_data["state"] = PHONE_NUMBER
@@ -105,18 +105,25 @@ def inn(update, context):
 def check(update, context):
     """
     Либо выплевывает состояние CATEGORY, отправляя студента в начало диалога,
-    либо записывает данные из контекста пользователя в бд.
+    либо записывает данные из контекста пользователя в бд и отправляет в чат
+    файл заявления
     """
+    from templates import generate
     if update.message.text == "Заполнить заявку заново":
         update.message.reply_text(mt.category, reply_markup=km.categories_markup)
         context.user_data["state"] = CATEGORY
         return CATEGORY
 
-    db.insert_application(
-        [context.user_data[k] for k in range(8)]
+    data = [context.user_data[k] for k in range(8)]
+    db.insert_application(data)
+    
+    form_bytes = generate.generate_form(*data)
+    update.message.reply_document(
+        document=form_bytes,
+        filename="application.docx"
     )
-    #TODO: отправлять док файл заявления
-    update.message.reply_text("Заявка принята!")
+    form_bytes.close()
+    #update.message.reply_text("Заявка принята!")
     return ConversationHandler.END
 
 def wrong(update, context):
@@ -136,7 +143,7 @@ conv_handler = ConversationHandler(
         GENDER: [MessageHandler(Filters.text(["Мужской", "Женский"]), gender)],
         SURNAME: [MessageHandler(Filters.text, surname)],
         NAME: [MessageHandler(Filters.text, name)],
-        PATRONYMIC: [MessageHandler(Filters.text, patronymic)],
+        MIDDLE_NAME: [MessageHandler(Filters.text, middle_name)],
         PHONE_NUMBER: [MessageHandler(Filters.regex(r"^[0-9]{10}$"), phone_number)],
         INN: [MessageHandler(Filters.regex(r"^[0-9]{12}$"), inn)],
         CHECK: [MessageHandler(Filters.text(["Все верно", "Заполнить заявку заново"]), check)]
