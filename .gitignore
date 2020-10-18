@@ -2,3 +2,4 @@
 env/
 set_env.sh
 __pycache__
+database/database.sqlite
