@@ -4,7 +4,7 @@ from database import db
 #Разметки клавиатур для выбора 
 #категории, пола и верные/неверные данные соотвественно
 categories_markup = ReplyKeyboardMarkup(
-    [[с] for с in db.get_categories_list()],
+    [[c] for c in db.get_categories_list()],
     one_time_keyboard=True
 )
 
