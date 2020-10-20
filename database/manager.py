@@ -10,7 +10,7 @@ class DBManager:
     def __init__(self):
         self.path = "database/database.sqlite"
     
-    def __enter__(self):
+    def __enter__(self) -> sqlite3.Cursor:
         """
         Метод определяет объект, который будет находиться, например,
         в переменной var, при использовании конструкции
@@ -24,4 +24,3 @@ class DBManager:
         """Определяет поведение при выходе из контекста"""
         self.conn.commit()
         self.conn.close()
-    

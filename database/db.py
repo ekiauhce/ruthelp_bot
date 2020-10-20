@@ -29,7 +29,7 @@ def create_directors():
         cur.execute(queries.create_directors_table)
         cur.execute(queries.insert_directors)
 
-def get_director(course):
+def get_director(course) -> str:
     """Возвращает инициалы зам. декана по номеру курса"""
     with DBManager() as cur:
         cur.execute(queries.select_director, course)
@@ -40,4 +40,3 @@ def init():
     create_categories()
     create_applications()
     create_directors()
-
