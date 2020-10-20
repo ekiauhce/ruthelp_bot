@@ -120,10 +120,11 @@ def check(update, context):
     form_bytes = generate.generate_form(*data)
     update.message.reply_document(
         document=form_bytes,
-        filename="application.docx"
+        filename="application.docx",
+        caption="Заявка принята!"
     )
+    #Закрываем буфер
     form_bytes.close()
-    #update.message.reply_text("Заявка принята!")
     return ConversationHandler.END
 
 def wrong(update, context):
@@ -135,6 +136,7 @@ def wrong(update, context):
 #Создаем хендлеры
 start_handler = CommandHandler("start", start)
 make_handler = CommandHandler("make", make)
+#TODO: добавить регулярки для ФИО
 conv_handler = ConversationHandler(
     entry_points=[make_handler],
     states={
