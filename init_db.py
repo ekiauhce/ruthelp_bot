@@ -1,4 +1,4 @@
-from database import db
+from database.db import init
 
 if __name__ == "__main__":
-    db.init()
+    init()
