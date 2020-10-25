@@ -1,6 +1,6 @@
 .vscode/
 env/
-set_env.sh
+# set_env.sh
 __pycache__
 database/database.sqlite
 database/debug_fill.py
