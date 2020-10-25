@@ -1,5 +1,7 @@
-from database import queries
-from database.manager import DBManager
+from . import queries
+from .manager import DBManager
+from typing import List, Tuple
+
 
 def create_categories():
     """Создает таблицу категорий в базе"""
@@ -34,6 +36,26 @@ def get_director(course) -> str:
     with DBManager() as cur:
         cur.execute(queries.select_director, course)
         return cur.fetchone()[0]
+
+def get_applications() -> List[Tuple[str]]:
+    """Возвращает таблицу заявок"""
+    with DBManager() as cur:
+        cur.execute(queries.select_applications)
+        return cur.fetchall()
+
+def get_applications_field_names() -> List[str]:
+    """Возвращает названия полей таблицы applications"""
+    with DBManager() as cur:
+        cur.execute(queries.select_applications_filed_names)
+        return [n[0] for n in cur.fetchall()]
+
+def set_application_ok(app_id: int):
+    """
+    Устанавливает значение 1 в столбце ok
+    для заявки с индексом app_id
+    """
+    with DBManager() as cur:
+        cur.execute(queries.update_application, [app_id])
 
 def init():
     """Создает схему бд, где нужно добавляет данные"""
