@@ -4,10 +4,19 @@ from telegram.ext import (
     MessageHandler,
     Filters
 )
+from . import message_text as mt
+from . import keyboard_markups as km
+from database.db import (
+    get_categories_list,
+     insert_application
+)
+from templates.generate import generate_form
+from spreadsheet.manage import (
+    download_from_db,
+    upload_to_db
+)
+from io import BytesIO
 
-from bot import message_text as mt
-from bot import keyboard_markups as km
-from database import db
 
 #Состояния, в которых может находится диалог
 CATEGORY, GROUP_NAME, GENDER, SURNAME, NAME, \
@@ -105,19 +114,17 @@ def inn(update, context):
 def check(update, context):
     """
     Либо выплевывает состояние CATEGORY, отправляя студента в начало диалога,
-    либо записывает данные из контекста пользователя в бд и отправляет в чат
-    файл заявления
+    либо записывает данные из контекста пользователя в бд и отправляет в чат файл заявки
     """
-    from templates import generate
     if update.message.text == "Заполнить заявку заново":
         update.message.reply_text(mt.category, reply_markup=km.categories_markup)
         context.user_data["state"] = CATEGORY
         return CATEGORY
 
     data = [context.user_data[k] for k in range(8)]
-    db.insert_application(data)
+    insert_application(data)
     
-    form_bytes = generate.generate_form(*data)
+    form_bytes = generate_form(*data)
     update.message.reply_document(
         document=form_bytes,
         filename="application.docx",
@@ -133,19 +140,47 @@ def wrong(update, context):
     return context.user_data["state"]
 
 
+def download(update, context):
+    """Отправляет xlsx файл, который содержит все заявки студентов"""
+    spreadsheet_bytes = download_from_db()
+    #TODO: caption с инструкцией
+    update.message.reply_document(
+        document=spreadsheet_bytes,
+        filename="applications.xlsx"
+    )
+
+def upload(update, context):
+    """Обрабатывает загрузку xlsx файлов"""
+    spreadsheet_bytes = BytesIO()
+    update.message.document.get_file().download(
+        out=spreadsheet_bytes
+    )
+    upload_to_db(spreadsheet_bytes)
+    update.message.reply_text("База данных успешно обновлена")
+
 #Создаем хендлеры
 start_handler = CommandHandler("start", start)
 make_handler = CommandHandler("make", make)
-#TODO: добавить регулярки для ФИО
+#TODO: db -> admins list -> filter
+download_handler = CommandHandler(
+    "download",
+    download,
+    filters=Filters.user(377064896)
+)
+upload_handler = MessageHandler(
+    Filters.document.mime_type("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    & Filters.user(377064896),
+    upload
+)
 conv_handler = ConversationHandler(
     entry_points=[make_handler],
     states={
-        CATEGORY: [MessageHandler(Filters.text(db.get_categories_list()), category)],
-        GROUP_NAME: [MessageHandler(Filters.regex(r"^[/А-ЯЁ/u]{3}-[1-5]{2}[1-9]$"), group_name)],
+        CATEGORY: [MessageHandler(Filters.text(get_categories_list()), category)],
+        GROUP_NAME: [MessageHandler(Filters.regex(r"^[А-ЯЁ]{3}-[1-5]{2}[1-9]$"), group_name)],
         GENDER: [MessageHandler(Filters.text(["Мужской", "Женский"]), gender)],
-        SURNAME: [MessageHandler(Filters.text, surname)],
-        NAME: [MessageHandler(Filters.text, name)],
-        MIDDLE_NAME: [MessageHandler(Filters.text, middle_name)],
+        SURNAME: [MessageHandler(Filters.regex(r"^[а-яёА-ЯЁ-]{1,20}$"), surname)],
+        NAME: [MessageHandler(Filters.regex(r"^[а-яёА-ЯЁ-]{1,20}$"), name)],
+        MIDDLE_NAME: [MessageHandler(Filters.regex(r"^[а-яёА-ЯЁ-]{1,20}$"), middle_name)],
         PHONE_NUMBER: [MessageHandler(Filters.regex(r"^[0-9]{10}$"), phone_number)],
         INN: [MessageHandler(Filters.regex(r"^[0-9]{12}$"), inn)],
         CHECK: [MessageHandler(Filters.text(["Все верно", "Заполнить заявку заново"]), check)]

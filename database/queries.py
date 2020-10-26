@@ -1,5 +1,3 @@
-#Сырые sql запросы
-
 create_categories_table = \
 """
 CREATE TABLE IF NOT EXISTS categories(
@@ -40,7 +38,8 @@ CREATE TABLE IF NOT EXISTS applications(
     name TEXT NOT NULL,
     middle_name TEXT NOT NULL,
     phone_number TEXT NOT NULL,
-    inn TEXT NOT NULL
+    inn TEXT NOT NULL,
+    ok INTEGER NOT NULL DEFAULT 0
 );
 """
 
@@ -78,10 +77,25 @@ INSERT INTO directors(director) VALUES
 
 select_director = \
 """
-SELECT 
-    director
-FROM
-    directors
-WHERE
-    director_id = ?;
+SELECT director
+FROM directors
+WHERE director_id = ?;
+"""
+
+select_applications = \
+"""
+SELECT * FROM applications;
+"""
+
+select_applications_filed_names = \
+"""
+SELECT name
+FROM PRAGMA_TABLE_INFO('applications');
+"""
+
+update_application = \
+"""
+UPDATE applications
+SET ok = 1
+WHERE application_id = ?;
 """

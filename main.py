@@ -1,6 +1,6 @@
 import logging
 from telegram.ext import Updater
-import os
+from os import environ
 from bot import handlers
 
 #TODO: писать логи в файл
@@ -11,12 +11,13 @@ logger = logging.getLogger(__name__)
 
 
 def main():
-    updater = Updater(os.environ.get("TG_API_TOKEN"))
+    updater = Updater(environ.get("TG_API_TOKEN"))
 
     dp = updater.dispatcher
     dp.add_handler(handlers.start_handler)
     dp.add_handler(handlers.conv_handler)
-
+    dp.add_handler(handlers.download_handler)
+    dp.add_handler(handlers.upload_handler)
     updater.start_polling()
     updater.idle()
 
