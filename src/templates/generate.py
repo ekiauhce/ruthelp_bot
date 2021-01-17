@@ -19,8 +19,9 @@ def get_genenitve_case(gender, surname, name, middle_name="") -> List[str]:
     )
     return resp.json()["cases"][1].split(" ")
 
+
 def generate_form(category, group_name, gender, surname,
-    name, middle_name, phone_number, inn) -> BytesIO:
+                  name, middle_name, phone_number, inn) -> BytesIO:
     """
     Генерирует форму в формате docx. Функция возвращает
     байтовый буфер, в котором содержится форма.
@@ -37,7 +38,7 @@ def generate_form(category, group_name, gender, surname,
         surname, name, middle_name = get_genenitve_case(
             gender, surname, name, middle_name
         )
-    
+
     course = group_name[4]
     context = {
         "gp": "а" if gender == "Мужской" else "ки",
@@ -53,10 +54,10 @@ def generate_form(category, group_name, gender, surname,
     }
     tpl.render(context)
 
-    #Создание буфера
+    # Создание буфера
     buffer = BytesIO()
-    #Сохраненяем отрендеренный шаблон формы в буфер
+    # Сохраненяем отрендеренный шаблон формы в буфер
     tpl.save(buffer)
-    #Возвращаемся в начало буфера
+    # Возвращаемся в начало буфера
     buffer.seek(0)
     return buffer

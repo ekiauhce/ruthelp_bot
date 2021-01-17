@@ -6,8 +6,7 @@ from openpyxl import (
 from openpyxl.styles import PatternFill
 from openpyxl.styles.differential import DifferentialStyle
 from openpyxl.formatting.rule import Rule
-from openpyxl.utils import get_column_letter
-from database.db import (
+from database import (
     get_applications_field_names,
     get_categories_list,
     get_applications,
@@ -22,8 +21,8 @@ style_green = DifferentialStyle(
     fill=PatternFill(bgColor="90EE90")   
 )
 
-#В случае изменения структуры дб -
-#изменить индекс
+# В случае изменения структуры дб -
+# изменить индекс
 rule_red = Rule(
     type="expression",
     dxf=style_red,
@@ -35,6 +34,7 @@ rule_green = Rule(
     dxf=style_green,
     formula=["$J1=1"]
 )
+
 
 def init_wb() -> Workbook:
     wb = Workbook()
@@ -55,7 +55,6 @@ def download_from_db() -> BytesIO:
     wb = init_wb()
     categories = get_categories_list()
     for app in get_applications():
-        categories = get_categories_list()
         if app[1] in categories[:3]:
             wb["1"].append(app)
         elif app[1] in categories[3:6] + categories[8:10]:
@@ -74,8 +73,8 @@ def download_from_db() -> BytesIO:
             ws.dimensions,
             rule_green
         )
-        #В случае изменения структуры дб -
-        #изменить индекс
+        # В случае изменения структуры дб -
+        # изменить индекс
         ws.auto_filter.ref = f"J1:J{ws.max_row}"
     buffer = BytesIO()
     wb.save(buffer)
@@ -84,10 +83,7 @@ def download_from_db() -> BytesIO:
 
 
 def upload_to_db(buffer: BytesIO):
-    """
-    Записывает изменения, сделанные в xlsx в файле,
-    в базу данных
-    """
+    """Записывает изменения, сделанные в xlsx в файле, в базу данных"""
     wb = load_workbook(filename=buffer)
     for ws in wb:
         for row in ws.iter_rows(min_row=2, max_row=ws.max_row):

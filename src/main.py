@@ -3,7 +3,7 @@ from telegram.ext import Updater
 from os import environ
 from bot import handlers
 
-#TODO: писать логи в файл
+# TODO: писать логи в файл
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )

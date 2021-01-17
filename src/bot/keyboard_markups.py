@@ -1,10 +1,10 @@
 from telegram import ReplyKeyboardMarkup
-from database import db
+from database import get_categories_list
 
-#Разметки клавиатур для выбора 
-#категории, пола и верные/неверные данные соотвественно
+# Разметки клавиатур для выбора
+# категории, пола и верные/неверные данные соотвественно
 categories_markup = ReplyKeyboardMarkup(
-    [[c] for c in db.get_categories_list()],
+    [[c] for c in get_categories_list()],
     one_time_keyboard=True
 )
 
