@@ -6,7 +6,7 @@ from requests import get
 from database.db import get_director
 
 
-def get_genenitve_case(gender, surname, name, middle_name="") -> List[str]:
+def get_genetive_case(gender, surname, name, middle_name="") -> List[str]:
     """Ставит ФИО в род. падеж, используя запрос к API morphos.io"""
     params = {
         "name": f"{surname} {name} {middle_name}",
@@ -33,11 +33,9 @@ def generate_form(category, group_name, gender, surname,
 
     if middle_name == "-":
         middle_name = ""
-        surname, name = get_genenitve_case(gender, surname, name)
+        surname, name = get_genetive_case(gender, surname, name)
     else:
-        surname, name, middle_name = get_genenitve_case(
-            gender, surname, name, middle_name
-        )
+        surname, name, middle_name = get_genetive_case(gender, surname, name, middle_name)
 
     course = group_name[4]
     context = {
