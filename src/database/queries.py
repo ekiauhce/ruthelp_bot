@@ -1,14 +1,12 @@
-create_categories_table = \
-"""
+create_categories_table = """
 CREATE TABLE IF NOT EXISTS categories(
     category_id INTEGER NOT NULL PRIMARY KEY,
-    category TEXT NOT NULL
+    category TEXT NOT NULL UNIQUE
 );
 """
 
-insert_categories = \
-"""
-INSERT INTO categories(category) VALUES
+insert_categories = """
+INSERT OR IGNORE INTO categories(category) VALUES
     ('студент-сирота'),
     ('cтудент-инвалид'),
     ('cтудент, имеющий детей'),
@@ -22,13 +20,11 @@ INSERT INTO categories(category) VALUES
     ('студент, проживающий в общежитии');
 """
 
-select_categories = \
-"""
+select_categories = """
 SELECT category FROM categories;
 """
 
-create_applications_table = \
-"""
+create_applications_table = """
 CREATE TABLE IF NOT EXISTS applications(
     application_id INTEGER NOT NULL PRIMARY KEY,
     category TEXT NOT NULL,
@@ -43,8 +39,7 @@ CREATE TABLE IF NOT EXISTS applications(
 );
 """
 
-insert_application = \
-"""
+insert_application = """
 INSERT INTO applications(
     category,
     group_name,
@@ -57,17 +52,15 @@ INSERT INTO applications(
 ) VALUES(?, ?, ?, ?, ?, ?, ?, ?);
 """
 
-create_directors_table = \
-"""
+create_directors_table = """
 CREATE TABLE IF NOT EXISTS directors(
     director_id INTEGER NOT NULL PRIMARY KEY,
-    director TEXT NOT NULL
+    director TEXT NOT NULL UNIQUE
 );
 """
 
-insert_directors = \
-"""
-INSERT INTO directors(director) VALUES
+insert_directors = """
+INSERT OR IGNORE INTO directors(director) VALUES
     ('Н.В. Попова'),
     ('И.А. Коновал'),
     ('Т.В. Гаранина'),
@@ -75,26 +68,22 @@ INSERT INTO directors(director) VALUES
     ('Н.Ю. Лахметкина');
 """
 
-select_director = \
-"""
+select_director = """
 SELECT director
 FROM directors
 WHERE director_id = ?;
 """
 
-select_applications = \
-"""
+select_applications = """
 SELECT * FROM applications;
 """
 
-select_applications_filed_names = \
-"""
+select_applications_field_names = """
 SELECT name
 FROM PRAGMA_TABLE_INFO('applications');
 """
 
-update_application = \
-"""
+update_application = """
 UPDATE applications
 SET ok = 1
 WHERE application_id = ?;
