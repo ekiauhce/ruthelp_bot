@@ -5,16 +5,19 @@ from database import get_categories_list, insert_application
 from spreadsheet import download_from_db, upload_to_db
 from templates import generate_form
 from io import BytesIO
+from log import get_logger
 
+logger = get_logger(__name__)
 
 # Состояния, в которых может находится диалог
-CATEGORY, GROUP_NAME, GENDER, SURNAME, NAME, MIDDLE_NAME, PHONE_NUMBER, INN, CHECK = range(9)
-
-# TODO: добавить логирование
+CATEGORY, GROUP_NAME, GENDER, SURNAME, NAME,\
+MIDDLE_NAME, PHONE_NUMBER, INN, CHECK = range(9)
 
 
 def start(update, context):
     """Отвечает на команду /start"""
+    logger.info(f"User with id {update.effective_user.id} started.")
+
     update.message.reply_text(mt.start)
 
 
@@ -26,6 +29,8 @@ def help(update, context):
 
 def make(update, context):
     """Отвечает на команду /make, предлагает выбрать категорию из списка"""
+    logger.info(f"User with id {update.effective_user.id} sent /make.")
+
     update.message.reply_text(mt.category, reply_markup=km.categories_markup)
     context.user_data["state"] = CATEGORY
     return CATEGORY
@@ -37,6 +42,8 @@ def category(update, context):
     Информация, записанная в контексте юзера будет болтаться в рантайме, а
     когда студент подтвердит правильность введенных данных, добавится в бд
     """
+    logger.info(f"User with id {update.effective_user.id} selected category [{update.message.text}].")
+
     context.user_data[CATEGORY] = update.message.text
 
     update.message.reply_text(mt.group_name)
@@ -46,6 +53,8 @@ def category(update, context):
 
 def group_name(update, context):
     """Добавляет группу в контекст пользователя и предлагает ввести пол"""
+    logger.info(f"User with id {update.effective_user.id} sent group name [{update.message.text}].")
+
     context.user_data[GROUP_NAME] = update.message.text
 
     update.message.reply_text(mt.gender, reply_markup=km.genders_markup)
@@ -55,6 +64,8 @@ def group_name(update, context):
 
 def gender(update, context):
     """Добавляет пол в контекст пользователя и предлагает ввести фамилию"""
+    logger.info(f"User with id {update.effective_user.id} selected gender [{update.message.text}].")
+
     context.user_data[GENDER] = update.message.text
 
     update.message.reply_text(mt.surname)
@@ -64,6 +75,8 @@ def gender(update, context):
 
 def surname(update, context):
     """Добавляет фамилию в контекст пользователя и предлагает ввести имя"""
+    logger.info(f"User with id {update.effective_user.id} sent surname [{update.message.text}].")
+
     context.user_data[SURNAME] = update.message.text
 
     update.message.reply_text(mt.name)
@@ -73,6 +86,8 @@ def surname(update, context):
 
 def name(update, context):
     """Добавляет имя в контекст пользователя и предлагает ввести отчество"""
+    logger.info(f"User with id {update.effective_user.id} sent name [{update.message.text}].")
+
     context.user_data[NAME] = update.message.text
 
     update.message.reply_text(mt.middle_name)
@@ -82,6 +97,8 @@ def name(update, context):
 
 def middle_name(update, context):
     """Добавляет отчество в контекст пользователя и предлагает ввести номер телефона"""
+    logger.info(f"User with id {update.effective_user.id} sent middle name [{update.message.text}].")
+
     context.user_data[MIDDLE_NAME] = update.message.text
 
     update.message.reply_text(mt.phone_number)
@@ -91,6 +108,8 @@ def middle_name(update, context):
 
 def phone_number(update, context):
     """Добавляет номер телефона в контекст пользователя и предлагает ввести ИНН"""
+    logger.info(f"User with id {update.effective_user.id} sent phone number [{update.message.text}] .")
+
     context.user_data[PHONE_NUMBER] = update.message.text
 
     update.message.reply_text(mt.inn)
@@ -99,7 +118,12 @@ def phone_number(update, context):
 
 
 def inn(update, context):
-    """Добавляет ИНН в контекст пользователя и предлагает подтвердить правильность введенных данных"""
+    """
+    Добавляет ИНН в контекст пользователя и предлагает подтвердить
+    правильность введенных данных
+    """
+    logger.info(f"User with id {update.effective_user.id} sent INN [{update.message.text}].")
+
     context.user_data[INN] = update.message.text
 
     update.message.reply_text(
@@ -113,9 +137,11 @@ def inn(update, context):
 
 def check(update, context):
     """
-    Возвращает состояние CATEGORY, отправляя студента в начало диалога,
-    или записывает данные из контекста пользователя в бд и отправляет в чат файл заявки
+    Возвращает состояние CATEGORY, отправляя студента в начало диалога, или
+    записывает данные из контекста пользователя в бд и отправляет в чат файл заявки
     """
+    logger.info(f"User with id {update.effective_user.id} selected [{update.message.text}].")
+
     if update.message.text == "Заполнить заявку заново":
         update.message.reply_text(mt.category, reply_markup=km.categories_markup)
         context.user_data["state"] = CATEGORY
@@ -137,12 +163,17 @@ def check(update, context):
 
 def wrong(update, context):
     """Хендлер обрабатывает любой неверный ввод и возвращает последнее состояние диалога"""
+    logger.info(f"User with id {update.effective_user.id} "
+                f"sent wrong input [{update.message.text}] on state [{context.user_data['state']}].")
+
     update.message.reply_text(mt.wrong)
     return context.user_data["state"]
 
 
 def download(update, context):
     """Отправляет xlsx файл, который содержит все заявки студентов"""
+    logger.info(f"User with id {update.effective_user.id} downloaded applications.xlsx.")
+
     spreadsheet_bytes = download_from_db()
     # TODO: caption с инструкцией
     update.message.reply_document(
@@ -153,6 +184,8 @@ def download(update, context):
 
 def upload(update, context):
     """Обрабатывает загрузку xlsx файлов"""
+    logger.info(f"User with id {update.effective_user.id} uploaded applications spreadsheet.")
+
     spreadsheet_bytes = BytesIO()
     update.message.document.get_file().download(
         out=spreadsheet_bytes

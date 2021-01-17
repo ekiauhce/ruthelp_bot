@@ -1,13 +1,10 @@
-import logging
 from telegram.ext import Updater
 from os import environ
 from bot import handlers
+from log import get_logger
 
-# TODO: писать логи в файл
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
-)
-logger = logging.getLogger(__name__)
+
+logger = get_logger(__name__)
 
 
 def main():
