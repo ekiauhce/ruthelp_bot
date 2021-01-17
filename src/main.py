@@ -7,6 +7,7 @@ from log import get_logger
 logger = get_logger(__name__)
 
 
+# TODO: настроить вебхуки
 def main():
     updater = Updater(environ.get("TG_API_TOKEN"))
 

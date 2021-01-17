@@ -13,6 +13,8 @@ from database import (
     set_application_ok
 )
 
+# TODO: отрефакторить это барахло
+
 style_red = DifferentialStyle(
     fill=PatternFill(bgColor="FFCCCB")
 )

@@ -194,6 +194,8 @@ def upload(update, context):
     update.message.reply_text("База данных успешно обновлена")
 
 
+# TODO: /add_admin добавить chat_id в список админов
+
 # Создаем хендлеры
 start_handler = CommandHandler("start", start)
 make_handler = CommandHandler("make", make)
