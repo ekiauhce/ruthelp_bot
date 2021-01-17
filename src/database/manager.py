@@ -8,8 +8,8 @@ class DBManager:
     
     def __enter__(self) -> sqlite3.Cursor:
         """
-        Метод определяет объект, который будет находиться, например, в переменной var, при использовании конструкции
-        with DBManager() as var:
+        Метод определяет объект, который будет находиться, например, в переменной var,
+        при использовании конструкции with DBManager() as var:
         """
         self.conn = sqlite3.connect(self.path)
         self.cursor = self.conn.cursor()
