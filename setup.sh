@@ -1,7 +1,3 @@
-# Change us!
-export TG_API_TOKEN=
-export HOST_IP=
-
 echo "Creating env directory..." &&
     python3 -m venv env &&
     echo "env directory has created" &&
