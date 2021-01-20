@@ -11,7 +11,8 @@ echo "Creating env directory..." &&
     deactivate &&
     echo "Environment has setup successfully!" &&
     echo "Creating SSL certificate..." &&
+    mkdir -p ssl &&
     openssl req -newkey rsa:2048 -sha256 -nodes \
-    -keyout private.key -x509 -days 3650 -out cert.pem \
+    -keyout ssl/private.key -x509 -days 3650 -out ssl/cert.pem \
     -subj "/C=US/ST=New York/L=Brooklyn/O=Example Brooklyn Company/CN=$HOST_IP" &&
     echo "SSL certificate has created successfully!"
