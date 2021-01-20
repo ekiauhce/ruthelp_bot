@@ -88,3 +88,30 @@ UPDATE applications
 SET ok = 1
 WHERE application_id = ?;
 """
+
+create_admins_table = """
+CREATE TABLE IF NOT EXISTS admins(
+    admin_id INTEGER NOT NULL PRIMARY KEY,
+    chat_id INTEGER NOT NULL UNIQUE
+);
+"""
+
+insert_author_to_admins = """
+INSERT OR IGNORE INTO admins (chat_id)
+VALUES (377064896);
+"""
+
+select_admins = """
+SELECT chat_id FROM admins;
+"""
+
+
+insert_admin = """
+INSERT OR IGNORE INTO admins (chat_id)
+VALUES (?);
+"""
+
+delete_admin = """
+DELETE FROM admins
+WHERE chat_id = ?;
+"""

@@ -16,6 +16,9 @@ def main():
     dp.add_handler(handlers.conv_handler)
     dp.add_handler(handlers.download_handler)
     dp.add_handler(handlers.upload_handler)
+    dp.add_handler(handlers.admins_handler)
+    dp.add_handler(handlers.add_admin_handler)
+    dp.add_handler(handlers.remove_admin_handler)
     updater.start_polling()
     updater.idle()
 
