@@ -25,8 +25,8 @@ def main():
     updater.start_webhook(listen='0.0.0.0',
                           port=8443,
                           url_path=TG_API_TOKEN,
-                          key='../private.key',
-                          cert='../cert.pem',
+                          key='../ssl/private.key',
+                          cert='../ssl/cert.pem',
                           webhook_url=f"https://{HOST_IP}:8443/{TG_API_TOKEN}")
     updater.idle()
 
