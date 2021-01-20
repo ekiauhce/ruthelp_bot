@@ -1,4 +1,4 @@
-# @ruthelp_bot completely guide to setup on Ubuntu server 20.04 
+# Completely guide to set up bot on Ubuntu server 20.04 
 
 ## Install python and venv
 
@@ -6,7 +6,7 @@
 sudo apt update && sudo apt install python3.8 python3-venv
 ```
 
-## Install from github
+## Clone from repo
 
 ```
 git clone https://github.com/ekiauce/ruthelp_bot
@@ -29,12 +29,31 @@ mkdir ssl
 openssl req -newkey rsa:2048 -sha256 -nodes -keyout ssl/private.key -x509 -days 3650 -out ssl/cert.pem -subj "/C=US/ST=New York/L=Brooklyn/O=Example Brooklyn Company/CN=your-domain-or-ip.com"
 ```
 
-## Make main.py and init_db.py executable
-```
-chmod u+x src/main.py
-chmod u+x src/init_db.py
-```
 ## Before launch
 
+Create file `/etc/system/systemd/ruthelp.service`:
 ```
+[Unit]
+Description=Service of telegram bot @ruthelp_bot
+Wants=network.target
+After=network.target
+
+[Service]
+Environment="TG_API_TOKEN=YOUR:TOKEN"
+Environment="HOST_IP=123.123.123.123"
+
+WorkingDirectory=/home/ekiauhce/code/python/ruthelp_bot/src/
+
+ExecStartPre=/home/ekiauhce/code/python/ruthelp_bot/env/bin/python init_db.py
+ExecStart=/home/ekiauhce/code/python/ruthelp_bot/env/bin/python main.py
+
+Restart=always
+RestartSec=10
+
+StandartOutput=append:/var/log/ruthelp.log
+StandartError=inherit
+
+[Install]
+WantedBy=multi-user.target
+
 ```
