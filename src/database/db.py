@@ -92,7 +92,7 @@ def delete_admin(chat_id: int) -> bool:
 
 
 def init() -> None:
-    """Создает схему бд, где нужно добавляет данные. Функция не переписывает данные в бд!!!"""
+    """Если базы данных не существует, создает схему бд, где нужно добавляет данные."""
     create_categories()
     create_applications()
     create_directors()
