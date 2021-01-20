@@ -1,8 +1,7 @@
 .vscode/
 .idea/
 env/
+ssl/
 __pycache__
 *.sqlite
 *.log
-*.pem
-*.key
