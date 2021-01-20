@@ -5,9 +5,9 @@ import database
 from spreadsheet import download_from_db, upload_to_db
 from templates import generate_form
 from io import BytesIO
-from log import get_logger
+import logging
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 # Состояния, в которых может находится диалог
 CATEGORY, GROUP_NAME, GENDER, SURNAME, NAME,\

@@ -1,12 +1,14 @@
-#! /home/ekiauhce/code/python/ruthelp_bot/env/bin/python
-
 from telegram.ext import Updater
 from os import environ
 from bot import handlers
-from log import get_logger
+import logging
 
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 TG_API_TOKEN = environ.get("TG_API_TOKEN")
 HOST_IP = environ.get("HOST_IP")
