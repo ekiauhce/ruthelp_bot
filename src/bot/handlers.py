@@ -218,7 +218,7 @@ def add_admin(update, context):
             update.message.reply_text(f"User with chat_id {chat_id} has added to admins")
             logger.info(f"User with chat_id {chat_id} added to admins")
         else:
-            update.message.reply_text(f"User with chat_id {chat_id} is already admin!")
+            update.message.reply_text(f"User with chat_id {chat_id} is already an admin!")
 
 
 def remove_admin(update, context):
@@ -235,7 +235,7 @@ def remove_admin(update, context):
             update.message.reply_text(f"User with chat_id {chat_id} has removed from admins")
             logger.info(f"User with chat_id {chat_id} removed from admins")
         else:
-            update.message.reply_text(f"User with chat_id {chat_id} is not admin!")
+            update.message.reply_text(f"User with chat_id {chat_id} is not an admin!")
 
 
 # Создаем хендлеры
