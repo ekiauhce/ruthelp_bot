@@ -8,12 +8,12 @@
 sudo apt update && sudo apt install -y python3.8 python3-venv
 git clone https://github.com/ekiauhce/ruthelp_bot
 cd ruthelp_bot/
-. setup.sh
 ```
 
 ## Before launch
 
-Change `TG_API_TOKEN` and `HOST_IP` in `setup.sh` file.
+Change `TG_API_TOKEN` and `HOST_IP` in `setup.sh` file and run it:
+`. setup.sh`
 
 ## How to run
 
