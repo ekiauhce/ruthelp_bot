@@ -61,11 +61,11 @@ CREATE TABLE IF NOT EXISTS directors(
 
 insert_directors = """
 INSERT OR IGNORE INTO directors(director) VALUES
-    ('    Н.В. Попова'),
+    ('Н.Ю. Лахметкина'),
+    ('   Е.В. Бычкова'),
     ('   И.А. Коновал'),
     ('  Т.В. Гаранина'),
-    ('   Е.В. Бычкова'),
-    ('Н.Ю. Лахметкина');
+    ('   Е.В. Бычкова');
 """
 
 select_director = """
