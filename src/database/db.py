@@ -96,3 +96,4 @@ def init() -> None:
     create_categories()
     create_applications()
     create_directors()
+    create_admins()
