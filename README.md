@@ -13,7 +13,7 @@ cd ruthelp_bot/
 
 ## Before launch
 
-Change `TG_API_TOKEN` and `HOST_IP` in `run.sh` file.
+Change `TG_API_TOKEN` and `HOST_IP` in `setup.sh` file.
 
 ## How to run
 
