@@ -1,9 +1,12 @@
 import logging
 
 logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO,
-    filemode="a",
-    filename="log/ruthelp.log"
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler("log/ruthelp.log"),
+        logging.StreamHandler()
+    ]
 )
 
 
