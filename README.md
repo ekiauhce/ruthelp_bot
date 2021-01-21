@@ -24,6 +24,7 @@ pip install -r requirements.txt
 
 ## Create SSL certificate
 
+Don't forget to change `CN=` part:
 ```
 mkdir ssl
 openssl req -newkey rsa:2048 -sha256 -nodes -keyout ssl/private.key -x509 -days 3650 -out ssl/cert.pem -subj "/C=US/ST=New York/L=Brooklyn/O=Example Brooklyn Company/CN=your-domain-or-ip.com"
@@ -31,7 +32,7 @@ openssl req -newkey rsa:2048 -sha256 -nodes -keyout ssl/private.key -x509 -days 
 
 ## Bot as systemd service
 
-Create file `/etc/system/systemd/ruthelp.service`:
+Create file `/etc/systemd/system/ruthelp.service`:
 ```
 [Unit]
 Description=Service of telegram bot @ruthelp_bot
@@ -40,10 +41,13 @@ After=network.target
 
 [Service]
 Environment="TG_API_TOKEN=YOUR:TOKEN"
+# HOST_IP might be a domain name
 Environment="HOST_IP=123.123.123.123"
 
+# Change to actual path in your system 
 WorkingDirectory=/home/ekiauhce/code/python/ruthelp_bot/src/
 
+# Path to python interpreter must be absolute
 ExecStartPre=/home/ekiauhce/code/python/ruthelp_bot/env/bin/python init_db.py
 ExecStart=/home/ekiauhce/code/python/ruthelp_bot/env/bin/python main.py
 
