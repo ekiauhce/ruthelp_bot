@@ -1,4 +1,4 @@
-# Completely guide to set up bot on Ubuntu server 20.04 
+# How to deploy on ubuntu server 20.04 
 
 ## Install python and venv
 
@@ -29,7 +29,7 @@ mkdir ssl
 openssl req -newkey rsa:2048 -sha256 -nodes -keyout ssl/private.key -x509 -days 3650 -out ssl/cert.pem -subj "/C=US/ST=New York/L=Brooklyn/O=Example Brooklyn Company/CN=your-domain-or-ip.com"
 ```
 
-## Before launch
+## Bot as systemd service
 
 Create file `/etc/system/systemd/ruthelp.service`:
 ```
@@ -55,12 +55,12 @@ StandardError=inherit
 
 [Install]
 WantedBy=multi-user.target
-
 ```
 
 ## Enable and start service
 
 ```
+sudo systemctl daemon-reload
 sudo systemctl enable ruthelp
 sudo systectml start ruthelp
 ```
