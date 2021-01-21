@@ -6,7 +6,7 @@
 sudo apt update && sudo apt install python3.8 python3-venv
 ```
 
-## Clone from repo
+## Clone repo
 
 ```
 git clone https://github.com/ekiauce/ruthelp_bot
@@ -50,10 +50,23 @@ ExecStart=/home/ekiauhce/code/python/ruthelp_bot/env/bin/python main.py
 Restart=always
 RestartSec=10
 
-StandartOutput=append:/var/log/ruthelp.log
-StandartError=inherit
+StandardOutput=append:/var/log/ruthelp.log
+StandardError=inherit
 
 [Install]
 WantedBy=multi-user.target
 
+```
+
+## Enable and start service
+
+```
+sudo systemctl enable ruthelp
+sudo systectml start ruthelp
+```
+Bot will start on every reboot and automatically restart when crash
+
+## View logs
+```
+less -N +G /var/log/ruthelp.log
 ```
