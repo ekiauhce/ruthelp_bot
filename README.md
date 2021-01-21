@@ -47,8 +47,12 @@ Environment="HOST_IP=123.123.123.123"
 # Change to actual path in your system 
 WorkingDirectory=/home/ekiauhce/code/python/ruthelp_bot/src/
 
+# Pull updates from github repo
+ExecStartPre=/usr/bin/git pull
+
 # Path to python interpreter must be absolute
 ExecStartPre=/home/ekiauhce/code/python/ruthelp_bot/env/bin/python init_db.py
+
 ExecStart=/home/ekiauhce/code/python/ruthelp_bot/env/bin/python main.py
 
 Restart=always
