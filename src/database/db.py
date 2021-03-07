@@ -91,9 +91,20 @@ def delete_admin(chat_id: int) -> bool:
         return False if cur.rowcount == 0 else True
 
 
-def init() -> None:
-    """Если базы данных не существует, создает схему бд, где нужно добавляет данные."""
-    create_categories()
-    create_applications()
-    create_directors()
-    create_admins()
+def init_schema() -> None:
+    """Иициализация схемы бд"""
+    with DBManager() as cur:
+        cur.execute(queries.create_categories_table)
+        cur.execute(queries.create_applications_table)
+        cur.execute(queries.create_directors_table)
+        cur.execute(queries.create_admins_table)
+        cur.execute(queries.create_documents_table)
+
+
+def init_data() -> None:
+    """Инициализация начальных данных"""
+    with DBManager() as cur:
+        cur.execute(queries.insert_categories)
+        cur.execute(queries.insert_directors)
+        cur.execute(queries.insert_author_to_admins)
+        cur.execute(queries.insert_documents)
