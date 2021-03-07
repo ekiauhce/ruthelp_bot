@@ -1,3 +1,4 @@
+from telegram import ParseMode
 from telegram.ext import ConversationHandler, CommandHandler, MessageHandler, Filters
 from . import message_text as mt
 from . import keyboard_markups as km
@@ -22,12 +23,6 @@ def start(update, context):
     logger.info(f"User with chat_id {update.effective_user.id} sent /start")
 
     update.message.reply_text(mt.start)
-
-
-def help(update, context):
-    """Отвечает на команду /help"""
-    # TODO: написать mt.help
-    update.message.reply_text(...)
 
 
 def make(update, context):
@@ -115,7 +110,7 @@ def phone_number(update, context):
 
     context.user_data[PHONE_NUMBER] = update.message.text
 
-    update.message.reply_text(mt.inn)
+    update.message.reply_text(mt.inn, parse_mode=ParseMode.HTML)
     context.user_data["state"] = INN
     return INN
 
@@ -132,23 +127,26 @@ def inn(update, context):
     update.message.reply_text(
         mt.check + "{}\n{}\n{}\n{} {} {}\n{}\n{}".format(
             *[context.user_data[k] for k in range(8)]
-        ), reply_markup=km.check_markup
+        ),
+        reply_markup=km.check_markup
     )
     context.user_data["state"] = CHECK
     return CHECK
 
 
-def check(update, context):
-    """
-    Возвращает состояние CATEGORY, отправляя студента в начало диалога, или
-    записывает данные из контекста пользователя в бд и отправляет в чат файл заявки
-    """
+def again(update, context):
+    """Возвращает состояние CATEGORY, отправляя студента в начало диалога"""
     logger.info(f"User with chat_id {update.effective_user.id} selected [{update.message.text}]")
 
-    if update.message.text == "Заполнить заявку заново":
-        update.message.reply_text(mt.category, reply_markup=km.categories_markup)
-        context.user_data["state"] = CATEGORY
-        return CATEGORY
+    context.user_data["state"] = CATEGORY
+    update.message.reply_text(mt.category, reply_markup=km.categories_markup)
+
+    return CATEGORY
+
+
+def check(update, context):
+    """Записывает данные из контекста пользователя в бд и отправляет в чат файл заявки"""
+    logger.info(f"User with chat_id {update.effective_user.id} selected [{update.message.text}]")
 
     data = [context.user_data[k] for k in range(8)]
     database.insert_application(data)
@@ -157,10 +155,43 @@ def check(update, context):
     update.message.reply_document(
         document=form_bytes,
         filename="application.docx",
-        caption="Заявка принята!"
+        caption=mt.success
     )
+
+    course = context.user_data[GROUP_NAME][4]
+    category_id = database.get_id_by_category(context.user_data[CATEGORY])
+
+    update.message.reply_text(
+        mt.prepare_documents +
+        "\n".join(["- <i>" + doc + "</i>" for doc in database.get_documents_list(category_id)]),
+        ParseMode.HTML
+    )
+
+    is_dorm = context.user_data[CATEGORY] == "студент, проживающий в общежитии"
+
+    update.message.reply_text(
+        mt.sign_documents +
+        "\n".join(["%d. " % i + step for i, step in enumerate(mt.print_and_sign + (mt.signs_for_dorm if is_dorm else []) + mt.bring_to_head, 1)]) +
+        mt.other_signs_not_needed,
+        ParseMode.HTML
+    )
+
+    update.message.reply_text(mt.your_head % database.get_director(course).strip(" "), ParseMode.HTML)
+    update.message.reply_text(mt.bring_it_to, ParseMode.HTML)
+    update.message.reply_text(mt.acceptance_period, ParseMode.HTML)
+    update.message.reply_text(mt.show_faq)
+
     # Закрываем буфер
     form_bytes.close()
+    return ConversationHandler.END
+
+
+def stop(update, context):
+    """Позволяет выйти из диалога"""
+    logger.info(f"User with chat_id {update.effective_user.id} stopped dialog")
+
+    update.message.reply_text(mt.stop)
+
     return ConversationHandler.END
 
 
@@ -214,9 +245,7 @@ def faq(update, context):
 
 def admins(update, context):
     """Возвращает список админов"""
-    update.message.reply_text(
-        "\n".join(map(str, admins_filter.user_ids))
-    )
+    update.message.reply_text("\n".join(map(str, admins_filter.user_ids)))
 
 
 def add_admin(update, context):
@@ -256,36 +285,18 @@ def remove_admin(update, context):
 # Создаем хендлеры
 start_handler = CommandHandler("start", start)
 make_handler = CommandHandler("make", make)
-
-admins_handler = CommandHandler(
-    command="admins",
-    callback=admins,
-    filters=author_filter
-)
-
-add_admin_handler = CommandHandler(
-    command="add_admin",
-    callback=add_admin,
-    filters=author_filter
-)
-
-remove_admin_handler = CommandHandler(
-    command="remove_admin",
-    callback=remove_admin,
-    filters=author_filter
-)
-
-download_handler = CommandHandler(
-    command="download",
-    callback=download,
-    filters=admins_filter
-)
-
+admins_handler = CommandHandler("admins", admins, author_filter)
+add_admin_handler = CommandHandler("add_admin", add_admin, author_filter)
+remove_admin_handler = CommandHandler("remove_admin", remove_admin, author_filter)
+download_handler = CommandHandler("download", download, admins_filter)
 upload_handler = MessageHandler(
-    callback=upload,
-    filters=Filters.document.mime_type("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-    & admins_filter
+    Filters.document.mime_type("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    & admins_filter,
+    upload
 )
+guide_handler = CommandHandler("guide", guide, admins_filter)
+faq_handler = CommandHandler("faq", faq)
+
 
 conv_handler = ConversationHandler(
     entry_points=[make_handler],
@@ -297,8 +308,15 @@ conv_handler = ConversationHandler(
         NAME:         [MessageHandler(Filters.regex(r"^[а-яёА-ЯЁ-]{1,20}$"), name)],
         MIDDLE_NAME:  [MessageHandler(Filters.regex(r"^[а-яёА-ЯЁ-]{1,20}$"), middle_name)],
         PHONE_NUMBER: [MessageHandler(Filters.regex(r"^[0-9]{10}$"), phone_number)],
-        INN:          [MessageHandler(Filters.regex(r"^[0-9]{12}$"), inn)],
-        CHECK:        [MessageHandler(Filters.text(["Все верно", "Заполнить заявку заново"]), check)]
+        INN:          [MessageHandler(Filters.regex(r"^[0-9]{10,13}$"), inn)],
+        CHECK:        [
+            MessageHandler(Filters.text(["Заполнить заявку заново"]), again),
+            MessageHandler(Filters.text(["Все верно"]), check)
+        ]
     },
-    fallbacks=[make_handler, MessageHandler(Filters.all, wrong)]
+    fallbacks=[
+        make_handler,
+        CommandHandler("stop", stop),
+        MessageHandler(Filters.all, wrong)
+    ]
 )
