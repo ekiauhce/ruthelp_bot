@@ -11,7 +11,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 TG_API_TOKEN = environ.get("TG_API_TOKEN")
-HOST_IP = environ.get("HOST_IP")
+# HOST_IP = environ.get("HOST_IP")
 
 
 def main():
@@ -22,16 +22,20 @@ def main():
     dp.add_handler(handlers.conv_handler)
     dp.add_handler(handlers.download_handler)
     dp.add_handler(handlers.upload_handler)
+    dp.add_handler(handlers.guide_handler)
+    dp.add_handler(handlers.faq_handler)
     dp.add_handler(handlers.admins_handler)
     dp.add_handler(handlers.add_admin_handler)
     dp.add_handler(handlers.remove_admin_handler)
 
-    updater.start_webhook(listen='0.0.0.0',
-                          port=8443,
-                          url_path=TG_API_TOKEN,
-                          key='../ssl/private.key',
-                          cert='../ssl/cert.pem',
-                          webhook_url=f"https://{HOST_IP}:8443/{TG_API_TOKEN}")
+    # updater.start_webhook(listen='0.0.0.0',
+    #                       port=8443,
+    #                       url_path=TG_API_TOKEN,
+    #                       key='../ssl/private.key',
+    #                       cert='../ssl/cert.pem',
+    #                       webhook_url=f"https://{HOST_IP}:8443/{TG_API_TOKEN}")
+
+    updater.start_polling()
     updater.idle()
 
 
