@@ -7,7 +7,6 @@ def create_categories() -> None:
     """Создает таблицу категорий в базе"""
     with DBManager() as cur:
         cur.execute(queries.create_categories_table)
-        cur.execute(queries.insert_categories)
 
 
 def get_categories_list() -> List[str]:
@@ -17,10 +16,24 @@ def get_categories_list() -> List[str]:
         return [row[0] for row in cur.fetchall()]
 
 
-def create_applications() -> None:
-    """Создает таблицу заявок"""
+def get_id_by_category(category: str) -> int:
+    """TODO: doc"""
     with DBManager() as cur:
-        cur.execute(queries.create_applications_table)
+        cur.execute(queries.select_category_id_by_category, (category, ))
+        return cur.fetchone()[0]
+
+
+def create_documents() -> None:
+    """TODO: doc"""
+    with DBManager() as cur:
+        cur.execute(queries.create_documents_table)
+
+
+def get_documents_list(category_id: int) -> List[str]:
+    """TODO: doc"""
+    with DBManager() as cur:
+        cur.execute(queries.select_documents, (category_id, ))
+        return [row[0] for row in cur.fetchall()]
 
 
 def insert_application(data) -> None:
@@ -28,12 +41,6 @@ def insert_application(data) -> None:
     with DBManager() as cur:
         cur.execute(queries.insert_application, data)
 
-
-def create_directors() -> None:
-    """Создает таблицу зам. декана"""
-    with DBManager() as cur:
-        cur.execute(queries.create_directors_table)
-        cur.execute(queries.insert_directors)
 
 
 def get_director(course) -> str:
