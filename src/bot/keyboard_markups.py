@@ -10,10 +10,12 @@ categories_markup = ReplyKeyboardMarkup(
 
 genders_markup = ReplyKeyboardMarkup(
     [["Мужской"], ["Женский"]],
+    resize_keyboard=True,
     one_time_keyboard=True
 )
 
 check_markup = ReplyKeyboardMarkup(
     [["Все верно"], ["Заполнить заявку заново"]],
+    resize_keyboard=True,
     one_time_keyboard=True
 )
