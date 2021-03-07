@@ -197,6 +197,21 @@ def upload(update, context):
     update.message.reply_text("База данных успешно обновлена!")
 
 
+def guide(update, context):
+    """Инструкция для админов"""
+
+    logger.info(f"User with chat_id {update.effective_user.id} sent /guide")
+
+    update.message.reply_text(mt.guide, ParseMode.HTML)
+
+
+def faq(update, context):
+    """Показывает список FAQ"""
+    logger.info(f"User with chat_id {update.effective_user.id} sent /faq")
+
+    update.message.reply_text(mt.faq, ParseMode.HTML)
+
+
 def admins(update, context):
     """Возвращает список админов"""
     update.message.reply_text(
