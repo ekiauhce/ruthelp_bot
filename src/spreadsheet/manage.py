@@ -61,7 +61,7 @@ def download_from_db() -> BytesIO:
             wb["1"].append(app)
         elif app[1] in categories[3:6] + categories[8:10]:
             wb["2"].append(app)
-        elif app[1] in categories[6:8]:
+        elif app[1] in categories[6:8] + [categories[11]]:
             wb["3"].append(app)
         elif app[1] == categories[10]:
             wb["4"].append(app)
