@@ -158,7 +158,9 @@ def check(update, context):
         caption=mt.success
     )
 
-    course = context.user_data[GROUP_NAME][4]
+    group = context.user_data[GROUP_NAME]
+
+    course = int(group[4]) if group[5] != "5" else int(group[4]) + int(group[5])
     category_id = database.get_id_by_category(context.user_data[CATEGORY])
 
     update.message.reply_text(
