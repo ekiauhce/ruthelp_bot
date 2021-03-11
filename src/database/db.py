@@ -43,10 +43,10 @@ def insert_application(data) -> None:
 
 
 
-def get_director(course) -> str:
+def get_director(course: int) -> str:
     """Возвращает инициалы зам. декана по номеру курса"""
     with DBManager() as cur:
-        cur.execute(queries.select_director, course)
+        cur.execute(queries.select_director, (course, ))
         return cur.fetchone()[0]
 
 
