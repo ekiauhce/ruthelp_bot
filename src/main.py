@@ -1,6 +1,7 @@
 from telegram.ext import Updater
 from os import environ
-from bot import handlers
+from bot import commands
+from bot import form
 import logging
 
 logging.basicConfig(
@@ -18,22 +19,9 @@ def main():
     updater = Updater(TG_API_TOKEN)
 
     dp = updater.dispatcher
-    dp.add_handler(handlers.start_handler)
-    dp.add_handler(handlers.conv_handler)
-    dp.add_handler(handlers.download_handler)
-    dp.add_handler(handlers.upload_handler)
-    dp.add_handler(handlers.guide_handler)
-    dp.add_handler(handlers.faq_handler)
-    dp.add_handler(handlers.admins_handler)
-    dp.add_handler(handlers.add_admin_handler)
-    dp.add_handler(handlers.remove_admin_handler)
 
-    # updater.start_webhook(listen='0.0.0.0',
-    #                       port=8443,
-    #                       url_path=TG_API_TOKEN,
-    #                       key='../ssl/private.key',
-    #                       cert='../ssl/cert.pem',
-    #                       webhook_url=f"https://{HOST_IP}:8443/{TG_API_TOKEN}")
+    [dp.add_handler(handler) for handler in commands.handlers_list]
+    dp.add_handler(form.conversation_handler)
 
     updater.start_polling()
     updater.idle()
