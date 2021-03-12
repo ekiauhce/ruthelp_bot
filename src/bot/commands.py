@@ -1,8 +1,8 @@
 import logging
 from io import BytesIO
 
-from telegram import ParseMode
-from telegram.ext import CommandHandler, MessageHandler, Filters
+from telegram import ParseMode, Update
+from telegram.ext import CommandHandler, MessageHandler, Filters, CallbackContext
 
 import database
 from spreadsheet import download_from_db, upload_to_db
@@ -13,14 +13,14 @@ from . import filters
 logger = logging.getLogger(__name__)
 
 
-def start(update, context):
+def start(update: Update, context: CallbackContext):
     """Отвечает на команду /start"""
     logger.info(f"User with chat_id {update.effective_user.id} sent /start")
 
     update.message.reply_text(messages.start)
 
 
-def download(update, context):
+def download(update: Update, context: CallbackContext):
     """Отправляет xlsx файл, который содержит все заявки студентов"""
     logger.info(f"User with chat_id {update.effective_user.id} downloaded applications.xlsx")
 
@@ -32,7 +32,7 @@ def download(update, context):
     )
 
 
-def upload(update, context):
+def upload(update: Update, context: CallbackContext):
     """Обрабатывает загрузку xlsx файлов"""
     logger.info(f"User with chat_id {update.effective_user.id} uploaded applications spreadsheet")
 
@@ -44,7 +44,7 @@ def upload(update, context):
     update.message.reply_text("База данных успешно обновлена!")
 
 
-def guide(update, context):
+def guide(update: Update, context: CallbackContext):
     """Инструкция для админов"""
 
     logger.info(f"User with chat_id {update.effective_user.id} sent /guide")
@@ -52,19 +52,19 @@ def guide(update, context):
     update.message.reply_text(messages.guide, ParseMode.HTML)
 
 
-def faq(update, context):
+def faq(update: Update, context: CallbackContext):
     """Показывает список FAQ"""
     logger.info(f"User with chat_id {update.effective_user.id} sent /faq")
 
     update.message.reply_text(messages.faq, ParseMode.HTML)
 
 
-def admins(update, context):
+def admins(update: Update, context: CallbackContext):
     """Возвращает список админов"""
     update.message.reply_text("\n".join(map(str, filters.admins.user_ids)))
 
 
-def add_admin(update, context):
+def add_admin(update: Update, context: CallbackContext):
     """Добавить пользователя в admins_filter и бд"""
     try:
         chat_id = int(context.args[0])
@@ -81,7 +81,7 @@ def add_admin(update, context):
             update.message.reply_text(f"User with chat_id {chat_id} is already an admin!")
 
 
-def remove_admin(update, context):
+def remove_admin(update: Update, context: CallbackContext):
     """Удалить пользователя из admins_filter и бд"""
     try:
         chat_id = int(context.args[0])
