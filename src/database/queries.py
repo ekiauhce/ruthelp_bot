@@ -132,8 +132,12 @@ SELECT * FROM applications;
 """
 
 select_applications_field_names = """
-SELECT name
-FROM PRAGMA_TABLE_INFO('applications');
+SELECT
+    column_name
+FROM
+    information_schema.columns
+WHERE
+    table_name = 'applications';
 """
 
 update_application = """
