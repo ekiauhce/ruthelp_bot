@@ -31,7 +31,7 @@ def main():
             listen="0.0.0.0",
             port=PORT,
             url_path=TG_API_TOKEN,
-            webhook_url="https://ruthelp_bot.herokuapp.com/" + TG_API_TOKEN)
+            webhook_url="https://ruthelp-bot.herokuapp.com/" + TG_API_TOKEN)
 
     updater.idle()
 
