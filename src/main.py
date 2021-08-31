@@ -1,3 +1,4 @@
+import os
 from telegram.ext import Updater
 from os import environ
 from bot import commands
@@ -12,7 +13,6 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 TG_API_TOKEN = environ.get("TG_API_TOKEN")
-# HOST_IP = environ.get("HOST_IP")
 
 
 def main():
@@ -23,7 +23,16 @@ def main():
     [dp.add_handler(handler) for handler in commands.handlers_list]
     dp.add_handler(form.conversation_handler)
 
-    updater.start_polling()
+    if "POLLING" in os.environ:
+        updater.start_polling()
+    else:
+        PORT = int(os.environ['PORT'])
+        updater.start_webhook(
+            listen="0.0.0.0",
+            port=PORT,
+            url_path=TG_API_TOKEN,
+            webhook_url="https://ruthelp_bot.herokuapp.com/" + TG_API_TOKEN)
+
     updater.idle()
 
 
