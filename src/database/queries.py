@@ -1,6 +1,6 @@
 create_categories_table = """
 CREATE TABLE IF NOT EXISTS categories(
-    category_id INTEGER NOT NULL PRIMARY KEY,
+    category_id SERIAL PRIMARY KEY,
     category TEXT NOT NULL UNIQUE
 );
 """
@@ -8,12 +8,12 @@ CREATE TABLE IF NOT EXISTS categories(
 select_category_id_by_category = """
 SELECT category_id
 FROM categories
-WHERE category = ?;
+WHERE category = %s;
 """
 
 create_documents_table = """
 CREATE TABLE IF NOT EXISTS documents(
-    documents_id INTEGER NOT NULL PRIMARY KEY,
+    documents_id SERIAL PRIMARY KEY,
     document TEXT NOT NULL,
     category_id INTEGER NOT NULL,
     FOREIGN KEY (category_id)
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS documents(
 """
 
 insert_documents = """
-INSERT OR IGNORE INTO documents(document, category_id) VALUES
+INSERT INTO documents(document, category_id) VALUES
     ('копии свидетельства о смерти родителей', 1),
     ('копии свидетельства о лишении родительских прав', 1),
     ('копии свидетельства о рождении ребенка (студента)', 1),
@@ -43,17 +43,18 @@ INSERT OR IGNORE INTO documents(document, category_id) VALUES
     ('копии свидетельства о рождении ребенка (студента)', 8),
     ('копия справки из центра социальной защиты населения', 9),
     ('справка из больницы (поликлиники) (состоит на диспансерном учете у ... с диагнозом ... нуждается в диет. питании) (подлинник)', 10),
-    ('дополнительных документов не требуется', 11);
+    ('дополнительных документов не требуется', 11)
+ON CONFLICT DO NOTHING;
 """
 
 select_documents = """
 SELECT document
 FROM documents
-WHERE category_id = ?;
+WHERE category_id = %s;
 """
 
 insert_categories = """
-INSERT OR IGNORE INTO categories(category) VALUES
+INSERT INTO categories(category) VALUES
     ('студент-сирота'),
     ('студент-инвалид'),
     ('студент, имеющий детей'),
@@ -65,7 +66,8 @@ INSERT OR IGNORE INTO categories(category) VALUES
     ('студент из малоимущей семьи'),
     ('студент, находящийся на диспансерном учёте с хроническими заболеваниями'),
     ('студент, проживающий в общежитии'),
-    ('студент, имеющий родителей-пенсионеров');
+    ('студент, имеющий родителей-пенсионеров')
+ON CONFLICT DO NOTHING;
 """
 
 select_categories = """
@@ -74,7 +76,7 @@ SELECT category FROM categories;
 
 create_applications_table = """
 CREATE TABLE IF NOT EXISTS applications(
-    application_id INTEGER NOT NULL PRIMARY KEY,
+    application_id SERIAL PRIMARY KEY,
     category TEXT NOT NULL,
     group_name TEXT NOT NULL,
     gender TEXT NOT NULL,
@@ -97,31 +99,32 @@ INSERT INTO applications(
     middle_name,
     phone_number,
     inn
-) VALUES(?, ?, ?, ?, ?, ?, ?, ?);
+) VALUES(%s, %s, %s, %s, %s, %s, %s, %s);
 """
 
 create_directors_table = """
 CREATE TABLE IF NOT EXISTS directors(
-    director_id INTEGER NOT NULL PRIMARY KEY,
+    director_id SERIAL PRIMARY KEY,
     director TEXT NOT NULL
 );
 """
 
 insert_directors = """
-INSERT OR IGNORE INTO directors(director) VALUES
+INSERT INTO directors(director) VALUES
     ('Н.Ю. Лахметкина'),
     ('   Е.В. Бычкова'),
     ('   И.А. Коновал'),
     ('  Т.В. Гаранина'),
     ('   Е.В. Бычкова'),
     (' М.А. Васильева'),
-    (' М.А. Васильева');
+    (' М.А. Васильева')
+ON CONFLICT DO NOTHING;
 """
 
 select_director = """
 SELECT director
 FROM directors
-WHERE director_id = ?;
+WHERE director_id = %s;
 """
 
 select_applications = """
@@ -136,19 +139,20 @@ FROM PRAGMA_TABLE_INFO('applications');
 update_application = """
 UPDATE applications
 SET ok = 1
-WHERE application_id = ?;
+WHERE application_id = %s;
 """
 
 create_admins_table = """
 CREATE TABLE IF NOT EXISTS admins(
-    admin_id INTEGER NOT NULL PRIMARY KEY,
+    admin_id SERIAL PRIMARY KEY,
     chat_id INTEGER NOT NULL UNIQUE
 );
 """
 
 insert_author_to_admins = """
-INSERT OR IGNORE INTO admins (chat_id)
-VALUES (377064896);
+INSERT INTO admins (chat_id)
+VALUES (377064896)
+ON CONFLICT DO NOTHING;
 """
 
 select_admins = """
@@ -157,11 +161,12 @@ SELECT chat_id FROM admins;
 
 
 insert_admin = """
-INSERT OR IGNORE INTO admins (chat_id)
-VALUES (?);
+INSERT INTO admins (chat_id)
+VALUES (%s)
+ON CONFLICT DO NOTHING;
 """
 
 delete_admin = """
 DELETE FROM admins
-WHERE chat_id = ?;
+WHERE chat_id = %s;
 """
