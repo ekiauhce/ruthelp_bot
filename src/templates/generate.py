@@ -2,22 +2,23 @@ from docxtpl import DocxTemplate
 from io import BytesIO
 from datetime import date
 from typing import List
-from requests import get
 from database.db import get_director
+from pytrovich.enums import NamePart, Gender, Case
+from pytrovich.maker import PetrovichDeclinationMaker
+
 
 
 def get_genetive_case(gender, surname, name, middle_name="") -> List[str]:
     """Ставит ФИО в род. падеж, используя запрос к API morphos.io"""
-    params = {
-        "name": f"{surname} {name} {middle_name}",
-        "gender": "m" if gender == "Мужской" else "f",
-        "format": "json"
-    }
-    resp = get(
-        "http://morphos.io/api/inflect-name",
-        params=params
-    )
-    return resp.json()["cases"][1].split(" ")
+    
+    gender = Gender.MALE if gender == "Мужской" else Gender.FEMALE
+    
+    maker = PetrovichDeclinationMaker()
+    surname = maker.make(NamePart.LASTNAME, gender, Case.GENITIVE, surname)
+    name = maker.make(NamePart.FIRSTNAME, gender, Case.GENITIVE, name)
+    middle_name = maker.make(NamePart.MIDDLENAME, gender, Case.GENITIVE, middle_name)
+
+    return [ surname, name, middle_name ]
 
 
 def generate_form(category, group_name, gender, surname,
@@ -27,9 +28,9 @@ def generate_form(category, group_name, gender, surname,
     байтовый буфер, в котором содержится форма.
     """
     if category == "студент, проживающий в общежитии":
-        tpl = DocxTemplate("templates/dorm.docx")
+        tpl = DocxTemplate("dorm.docx")
     else:
-        tpl = DocxTemplate("templates/common.docx")
+        tpl = DocxTemplate("common.docx")
 
     if middle_name == "-":
         middle_name = ""
