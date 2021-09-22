@@ -2,15 +2,17 @@ import logging
 from io import BytesIO
 
 from telegram import ParseMode, Update
-from telegram.ext import CommandHandler, MessageHandler, Filters, CallbackContext
+from telegram.ext import CommandHandler, MessageHandler, Filters, CallbackContext, ConversationHandler
+import os
 
 import database
 from spreadsheet import download_from_db, upload_to_db
 from . import messages
 
-from . import filters
-
 logger = logging.getLogger(__name__)
+
+
+PASSWORD = os.environ.get("ADMIN_PASS")
 
 
 def start(update: Update, context: CallbackContext):
@@ -22,7 +24,13 @@ def start(update: Update, context: CallbackContext):
 
 def download(update: Update, context: CallbackContext):
     """Отправляет xlsx файл, который содержит все заявки студентов"""
-    logger.info(f"User with chat_id {update.effective_user.id} downloaded applications.xlsx")
+    logger.info(f"User with chat_id {update.effective_user.id} sent /download")
+
+    if len(context.args) != 1 or context.args[0] != PASSWORD:
+        update.message.reply_text("Неверный пароль!")
+        logger.info(f"User with chat_id {update.effective_user.id} sent wrong password")
+        return
+
 
     spreadsheet_bytes = download_from_db()
     # TODO: caption с инструкцией
@@ -34,8 +42,21 @@ def download(update: Update, context: CallbackContext):
 
 def upload(update: Update, context: CallbackContext):
     """Обрабатывает загрузку xlsx файлов"""
-    logger.info(f"User with chat_id {update.effective_user.id} uploaded applications spreadsheet")
+    logger.info(f"User with chat_id {update.effective_user.id} sent /upload")
 
+    if len(context.args) != 1 or context.args[0] != PASSWORD:
+        update.message.reply_text("Неверный пароль!")
+        logger.info(f"User with chat_id {update.effective_user.id} sent wrong password")
+        return
+
+    update.message.reply_text("Отправь файл с таблицей:")
+    
+
+    return 1
+
+
+def upload_file(update: Update, context: CallbackContext):
+    
     spreadsheet_bytes = BytesIO()
     update.message.document.get_file().download(
         out=spreadsheet_bytes
@@ -43,11 +64,24 @@ def upload(update: Update, context: CallbackContext):
     upload_to_db(spreadsheet_bytes)
     update.message.reply_text("База данных успешно обновлена!")
 
+    return ConversationHandler.END
+
+
+def upload_fallback(update: Update, context: CallbackContext):
+    update.message.reply_text("Неверное расширение файла!")
+
+    return ConversationHandler.END
+    
 
 def guide(update: Update, context: CallbackContext):
     """Инструкция для админов"""
 
     logger.info(f"User with chat_id {update.effective_user.id} sent /guide")
+
+    if len(context.args) != 1 or context.args[0] != PASSWORD:
+        update.message.reply_text("Неверный пароль!")
+        logger.info(f"User with chat_id {update.effective_user.id} sent wrong password")
+        return
 
     update.message.reply_text(messages.guide, ParseMode.HTML)
 
@@ -59,55 +93,20 @@ def faq(update: Update, context: CallbackContext):
     update.message.reply_text(messages.faq, ParseMode.HTML)
 
 
-def admins(update: Update, context: CallbackContext):
-    """Возвращает список админов"""
-    update.message.reply_text("\n".join(map(str, filters.admins.user_ids)))
-
-
-def add_admin(update: Update, context: CallbackContext):
-    """Добавить пользователя в admins_filter и бд"""
-    try:
-        chat_id = int(context.args[0])
-    except ValueError:
-        update.message.reply_text("Invalid chat_id! int expected")
-    except IndexError:
-        update.message.reply_text("Enter chat_id as command argument!")
-    else:
-        filters.admins.add_user_ids(chat_id)
-        if database.insert_admin(chat_id):
-            update.message.reply_text(f"User with chat_id {chat_id} has added to admins")
-            logger.info(f"User with chat_id {chat_id} added to admins")
-        else:
-            update.message.reply_text(f"User with chat_id {chat_id} is already an admin!")
-
-
-def remove_admin(update: Update, context: CallbackContext):
-    """Удалить пользователя из admins_filter и бд"""
-    try:
-        chat_id = int(context.args[0])
-    except ValueError:
-        update.message.reply_text("Invalid chat_id! int expected")
-    except IndexError:
-        update.message.reply_text("Enter chat_id as command argument!")
-    else:
-        filters.admins.remove_user_ids(chat_id)
-        if database.delete_admin(chat_id):
-            update.message.reply_text(f"User with chat_id {chat_id} has removed from admins")
-            logger.info(f"User with chat_id {chat_id} removed from admins")
-        else:
-            update.message.reply_text(f"User with chat_id {chat_id} is not an admin!")
-
+    
 
 # Создаем хендлеры
 
 handlers_list = [
     CommandHandler("start", start),
-    CommandHandler("admins", admins, filters.author),
-    CommandHandler("add_admin", add_admin, filters.author),
-    CommandHandler("remove_admin", remove_admin, filters.author),
-    CommandHandler("download", download, filters.admins),
-    CommandHandler("guide", guide, filters.admins),
+    CommandHandler("download", download),
+    CommandHandler("guide", guide),
     CommandHandler("faq", faq),
-    MessageHandler(Filters.document.mime_type("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-                   & filters.admins, upload)
+    ConversationHandler(
+        entry_points=[CommandHandler("upload", upload)],
+        states={
+            1: [MessageHandler(Filters.document.mime_type("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"), upload_file)]
+        },
+        fallbacks=[MessageHandler(Filters.all, upload_fallback)]
+    ),
 ]

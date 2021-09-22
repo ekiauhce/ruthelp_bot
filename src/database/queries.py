@@ -145,32 +145,3 @@ UPDATE applications
 SET ok = 1
 WHERE application_id = %s;
 """
-
-create_admins_table = """
-CREATE TABLE IF NOT EXISTS admins(
-    admin_id SERIAL PRIMARY KEY,
-    chat_id INTEGER NOT NULL UNIQUE
-);
-"""
-
-insert_author_to_admins = """
-INSERT INTO admins (chat_id)
-VALUES (377064896)
-ON CONFLICT DO NOTHING;
-"""
-
-select_admins = """
-SELECT chat_id FROM admins;
-"""
-
-
-insert_admin = """
-INSERT INTO admins (chat_id)
-VALUES (%s)
-ON CONFLICT DO NOTHING;
-"""
-
-delete_admin = """
-DELETE FROM admins
-WHERE chat_id = %s;
-"""
