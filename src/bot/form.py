@@ -4,7 +4,7 @@ import logging
 from enum import Enum
 from typing import List
 
-from telegram import Update, ParseMode
+from telegram import Update, ParseMode, ReplyKeyboardRemove
 from telegram.ext import CallbackContext, ConversationHandler, CommandHandler, MessageHandler, Filters
 
 import database
@@ -164,7 +164,8 @@ def check(update: Update, context: CallbackContext):
     update.message.reply_text(
         messages.prepare_documents +
         "\n".join(["- <i>" + doc + "</i>" for doc in database.get_documents_list(category_id)]),
-        ParseMode.HTML
+        ParseMode.HTML,
+        reply_markup=ReplyKeyboardRemove()
     )
 
     is_dorm = context.user_data[State.CATEGORY] == "студент, проживающий в общежитии"
@@ -177,7 +178,11 @@ def check(update: Update, context: CallbackContext):
         ParseMode.HTML
     )
 
-    update.message.reply_text(messages.your_head % database.get_director(course).strip(" "), ParseMode.HTML)
+    update.message.reply_text(
+        messages.your_head % database.get_director(course) + "\n" +
+        messages.your_office % "1401 или 1403" if course < 5 else "1420-1",
+        ParseMode.HTML
+    )
     update.message.reply_text(messages.bring_it_to, ParseMode.HTML)
     update.message.reply_text(messages.acceptance_period, ParseMode.HTML)
     update.message.reply_text(messages.show_faq)
