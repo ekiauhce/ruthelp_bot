@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS categories(
 select_category_id_by_category = """
 SELECT category_id
 FROM categories
-WHERE category = %s;
+WHERE category like '%%%s%%';
 """
 
 create_documents_table = """
