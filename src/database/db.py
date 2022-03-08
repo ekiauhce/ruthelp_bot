@@ -19,7 +19,7 @@ def get_categories_list() -> List[str]:
 def get_id_by_category(category: str) -> int:
     """TODO: doc"""
     with DBManager() as cur:
-        cur.execute(queries.select_category_id_by_category, (category, ))
+        cur.execute(queries.select_category_id_by_category, ("%" + category + "%", ))
         return cur.fetchone()[0]
 
 
