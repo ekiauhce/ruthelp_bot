@@ -113,10 +113,10 @@ CREATE TABLE IF NOT EXISTS directors(
 
 insert_directors = """
 INSERT INTO directors(director) VALUES
+    ('И.А. Коновал'),
     ('Н.В. Попова'),
     ('И.М. Самойлова'),
     ('Е.В. Бычкова'),
-    ('И.А. Коновал'),
     ('Т.В. Гаранина'),
     ('М.А. Васильева'),
     ('М.А. Васильева')
