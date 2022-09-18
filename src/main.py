@@ -26,10 +26,9 @@ def main():
     if "POLLING" in os.environ:
         updater.start_polling()
     else:
-        PORT = int(os.environ['PORT'])
         updater.start_webhook(
             listen="0.0.0.0",
-            port=PORT,
+            port=80,
             url_path=TG_API_TOKEN,
             webhook_url="https://ekiauhce.xyz/ruthelp/" + TG_API_TOKEN)
 
