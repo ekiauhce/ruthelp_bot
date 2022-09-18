@@ -1,0 +1,22 @@
+version: '3.5'
+
+services:
+
+  db:
+    container_name: ruthelp-db
+    image: postgres:10.5
+    restart: always
+    env_file:
+      - ruthelp.env
+
+  bot:
+    container_name: ruthelp-bot
+    image: ekiauhce/ruthelp-bot:latest
+    restart: always
+    build: .
+    ports:
+      - "5200:80"
+    env_file:
+      - ruthelp.env
+    depends_on:
+      - db
