@@ -226,7 +226,7 @@ conversation_handler = ConversationHandler(
     entry_points=[make_handler],
     states={
         State.CATEGORY:     [MessageHandler(Filters.text(database.get_categories_list()), category)],
-        State.GROUP_NAME:   [MessageHandler(Filters.regex(r"^[А-ЯЁ]{3}-[1-5]{2}[1-9]$"), group_name)],
+        State.GROUP_NAME:   [MessageHandler(Filters.regex(r"^[А-ЯЁ]{3}-[1-5][1-7][1-9]$"), group_name)],
         State.GENDER:       [MessageHandler(Filters.text(["Мужской", "Женский"]), gender)],
         State.SURNAME:      [MessageHandler(Filters.regex(r"^[а-яёА-ЯЁ-]{1,20}$"), surname)],
         State.NAME:         [MessageHandler(Filters.regex(r"^[а-яёА-ЯЁ-]{1,20}$"), name)],
