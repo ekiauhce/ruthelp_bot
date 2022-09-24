@@ -38,7 +38,12 @@ def generate_form(category, group_name, gender, surname,
     else:
         surname, name, middle_name = get_genetive_case(gender, surname, name, middle_name)
 
-    course = int(group_name[4]) if group_name[5] != "5" else int(group_name[4]) + int(group_name[5])
+    # УПМ-211
+    if group_name[5] == "7": # master 
+        course = int(group_name[4]) + 5
+    else: # bachelor and specialist 
+        course = int(group_name[4]) 
+    
     context = {
         "gp": "а" if gender == "Мужской" else "ки",
         "gn": group_name,
