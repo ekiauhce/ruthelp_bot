@@ -158,7 +158,11 @@ def check(update: Update, context: CallbackContext):
 
     group = context.user_data[State.GROUP_NAME]
 
-    course = int(group[4]) if group[5] != "5" else int(group[4]) + int(group[5])
+    if group[5] == "7": # master 
+        course = int(group[4]) + 5
+    else: # bachelor and specialist 
+        course = int(group[4]) 
+    
     category_id = database.get_id_by_category(context.user_data[State.CATEGORY])
 
     update.message.reply_text(

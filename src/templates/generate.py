@@ -7,7 +7,6 @@ from pytrovich.enums import NamePart, Gender, Case
 from pytrovich.maker import PetrovichDeclinationMaker
 
 
-
 def get_genetive_case(gender, surname, name, middle_name="") -> List[str]:
     """Ставит ФИО в род. падеж, используя запрос к API morphos.io"""
     
