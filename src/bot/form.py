@@ -182,9 +182,20 @@ def check(update: Update, context: CallbackContext):
         ParseMode.HTML
     )
 
+    offices = {
+        1: "1403-2",
+        2: "1403-3",
+        3: "1401-1",
+        4: "1403-3",
+        5: "1401-2",
+        # master
+        6: "1420-1",
+        7: "1420-1",
+    }
+
     update.message.reply_text(
         messages.your_head % database.get_director(course) + "\n" +
-        messages.your_office % "1401 или 1403" if course < 5 else "1420-1",
+        messages.your_office % offices[course],
         ParseMode.HTML
     )
     update.message.reply_text(messages.bring_it_to, ParseMode.HTML)
